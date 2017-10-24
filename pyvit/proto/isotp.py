@@ -154,7 +154,7 @@ class IsotpInterface:
         data = None
         start = time.time()
 
-        self._set_filter()
+        #self._set_filter()
 
         self.block_size = bs
 
@@ -183,14 +183,15 @@ class IsotpInterface:
             if time.time() - start > timeout:
                 return None
 
-        self._unset_filter()
+        #self._unset_filter()
         return data
 
-    def send(self, data):
+    def send(self, data, timeout=0):
+        start = time.time()
         if len(data) > 4095:
             raise ValueError('ISOTP data must be <= 4095 bytes long')
 
-        self._set_filter()
+        #self._set_filter()
 
         if len(data) < 8:
             # message is less than 8 bytes, use single frame
@@ -235,6 +236,8 @@ class IsotpInterface:
                     if fc_bs == 0:
                         # must wait for a flow control frame
                         while True:
+                            if (timeout is not 0 ) and (time.time() - start > timeout):
+                                return
                             rx_frame = self._recv_queue.get()
                             if (rx_frame.arb_id == self.rx_arb_id and
                                     rx_frame.data[0] == 0x30):
@@ -275,4 +278,4 @@ class IsotpInterface:
 
                 bytes_sent = bytes_sent + data_bytes_in_msg
 
-        self._unset_filter()
+        #self._unset_filter()

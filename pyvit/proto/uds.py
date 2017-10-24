@@ -1363,7 +1363,7 @@ class UDSInterface(IsotpInterface):
         super().__init__(dispatcher, tx_arb_id, rx_arb_id)
 
     def request(self, service, timeout=0.5):
-        self.send(service.encode())
+        self.send(service.encode(), timeout=timeout)
         data = self.recv(timeout=timeout)
         if data is None:
             return None
